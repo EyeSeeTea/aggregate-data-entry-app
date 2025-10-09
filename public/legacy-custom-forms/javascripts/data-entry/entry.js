@@ -52,13 +52,13 @@ dhis2.de.updateIndicators = function()
 
         if ( typeof formula !== 'undefined' )
         {        
-	        var expression = dhis2.de.generateExpression( formula );
+	        var expression = dhis2.de.generateExpression( formula?.explodedNumerator );
 
 	        if ( expression )
 	        {
 		        var value = eval( expression );
 
-		        value = isNaN( value ) ? '-' : roundTo( value, 1 );
+		        value = isNaN( value ) ? '-' : Math.round( value, 1 );
 		
 		        $( this ).val( value );
 	        }
