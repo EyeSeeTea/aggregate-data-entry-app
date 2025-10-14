@@ -15,6 +15,7 @@ import {
 } from '../shared/index.js'
 import { Layout } from './layout/index.js'
 import LoadApp from './load-app.jsx'
+import { LegacyDhis2BridgeProvider } from '../shared/legacy-dhis2-bridge/LegacyDhis2BridgeProvider'
 
 const idSidebarMap = {
     [contextualHelpSidebarId]: ContextualHelpSidebar,
@@ -44,12 +45,14 @@ const App = () => {
 
     return (
         <LoadApp>
-            <Layout
-                header={contextSelection}
-                main={dataWorkspace}
-                sidebar={<RightHandPanel idSidebarMap={idSidebarMap} />}
-                showSidebar={!!id}
-            />
+            <LegacyDhis2BridgeProvider>
+                <Layout
+                    header={contextSelection}
+                    main={dataWorkspace}
+                    sidebar={<RightHandPanel idSidebarMap={idSidebarMap} />}
+                    showSidebar={!!id}
+                />
+            </LegacyDhis2BridgeProvider>
         </LoadApp>
     )
 }
