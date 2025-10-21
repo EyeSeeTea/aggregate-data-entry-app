@@ -4,6 +4,8 @@ import useCustomForm from '../../custom-forms/use-custom-form.js'
 import { useMetadata } from '../../shared/index.js'
 import styles from './custom-form.module.css'
 import { parseHtmlToReact } from './parse-html-to-react.jsx'
+import { useLegacyDhis2BridgeContext } from '../../shared/legacy-dhis2-bridge/LegacyDhis2BridgeProvider'
+import { DE_EVENTS } from '../../shared/legacy-dhis2-bridge/legacyEvents'
 
 export const CustomForm = ({ dataSet }) => {
     const { data: customForm } = useCustomForm({
@@ -11,6 +13,7 @@ export const CustomForm = ({ dataSet }) => {
         version: dataSet.version,
     })
     const { data: metadata } = useMetadata()
+    const { emit } = useLegacyDhis2BridgeContext()
 
     const containerRef = useRef(null)
 
@@ -27,8 +30,15 @@ export const CustomForm = ({ dataSet }) => {
                 newScript.text = oldScript.innerHTML
                 oldScript.parentNode.replaceChild(newScript, oldScript)
             })
+
+            // Emit formLoaded after scripts have been injected and executed
+            // Use a short delay to allow async script initialization (dependency loading)
+            // assuming only custom forms use the legacy bridge now
+            setTimeout(() => {
+                emit(DE_EVENTS.formLoaded, dataSet.id)
+            }, 0)
         }
-    }, [customForm])
+    }, [customForm, dataSet.id, emit])
 
     return customForm ? (
         <div className={styles.customForm} ref={containerRef}>
