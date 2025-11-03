@@ -114,6 +114,7 @@ export const GenericInput = ({
 
     return (
         <input
+            id={`${deId}-${cocId}`}
             value={value ?? ''}
             className={cx(styles.basicInput, {
                 [styles.alignToEnd]: NUMBER_TYPES.includes(valueType),

@@ -1,15 +1,11 @@
 import PropTypes from 'prop-types'
-import React from 'react'
+import React, { useRef } from 'react'
 import useCustomForm from '../../custom-forms/use-custom-form.js'
 import { useMetadata } from '../../shared/index.js'
 import styles from './custom-form.module.css'
 import { parseHtmlToReact } from './parse-html-to-react.jsx'
+import { useRunInlineScripts } from "../../shared/legacy-dhis2-bridge/use-run-inline-scripts";
 
-/**
- * This implementation of custom forms only supports custom
- * HTML and CSS. It does not support custom logic (JavaScript).
- * For more info see ./docs/custom-froms.md
- */
 export const CustomForm = ({ dataSet }) => {
     const { data: customForm } = useCustomForm({
         id: dataSet.dataEntryForm.id,
@@ -17,8 +13,16 @@ export const CustomForm = ({ dataSet }) => {
     })
     const { data: metadata } = useMetadata()
 
+    const containerRef = useRef(null)
+
+    useRunInlineScripts({
+        containerRef,
+        dataSetId: dataSet.id
+    }, [customForm?.htmlCode, dataSet.id])
+
+
     return customForm ? (
-        <div className={styles.customForm}>
+        <div className={styles.customForm} ref={containerRef}>
             {parseHtmlToReact(customForm.htmlCode, metadata)}
         </div>
     ) : null

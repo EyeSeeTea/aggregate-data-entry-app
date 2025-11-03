@@ -12,8 +12,8 @@ export const parseHtmlToReact = (htmlCode, metadata) =>
                 case 'td':
                     return replaceTdNode(domNode, metadata)
                 case 'script':
-                    // remove script tags
-                    return <></>
+                    // Always allow scripts to pass through, but execute them manually in CustomForm
+                    return undefined
                 default:
                     return undefined
             }
