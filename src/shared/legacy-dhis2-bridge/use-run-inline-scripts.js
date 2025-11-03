@@ -1,4 +1,4 @@
-import { useRef, useEffect } from 'react';
+import { useEffect } from 'react';
 import { DE_EVENTS } from './legacy-events';
 import { useCustomEvent } from './use-emit';
 
