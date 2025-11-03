@@ -1,10 +1,8 @@
 import React, { createContext, useContext, useEffect, useMemo } from 'react'
 import { updateDhis2Bridge, initializeDhis2Bridge } from './utils.js'
 import { useEmitOnChange } from './useEmit.js'
-import { DE_EVENTS, FIELD_EVENTS } from './legacyEvents.js'
+import { FIELD_EVENTS } from './legacyEvents.js'
 import {
-    selectors,
-    useMetadata,
     usePeriod,
     useDataSetId,
     useOrgUnitId,
@@ -21,8 +19,6 @@ export function LegacyDhis2BridgeProvider({ children }) {
     const [orgUnitId] = useOrgUnitId()
 
     const selectedPeriod = usePeriod(periodId)
-
-    const { data: metadata } = useMetadata()
 
     useEmitOnChange(selectedPeriod, { eventName: FIELD_EVENTS.period })
     useEmitOnChange(dataSetId, { eventName: FIELD_EVENTS.dataSet })

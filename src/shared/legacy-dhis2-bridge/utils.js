@@ -3,7 +3,7 @@ import { DE_EVENTS } from './legacyEvents'
 export function initializeDhis2Bridge() {
     if (typeof window === 'undefined') return
 
-    // Only skip if our bridge already initialized it
+    // Only skip if bridge already initialized it
     if (window.isLegacyDhis2Bridge && window.dhis2) return
 
     window.dhis2 = {
@@ -37,8 +37,4 @@ export function updateDhis2Bridge(orgUnitId, dataSetId, selectedPeriod) {
         window.dhis2.de.currentDataSetId = dataSetId
         window.dhis2.de.getSelectedPeriod = () => selectedPeriod
     }
-}
-
-if (typeof window !== 'undefined') {
-    initializeDhis2Bridge()
 }
