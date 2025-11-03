@@ -28,27 +28,27 @@ export function useRunCustomFormScripts(
 function runScriptsInOrder(container) {
     const originals = [...container.querySelectorAll('script')];
 
-    return originals.reduce((chain, old) => {
+    return originals.reduce((chain, script) => {
         return chain.then(() => new Promise((resolve) => {
             const s = document.createElement('script');
-            copyOrderedAttrs(old, s);
+            copyOrderedAttrs(script, s);
 
-            const type = (old.getAttribute('type') || '').trim();
+            const type = (script.getAttribute('type') || '').trim();
             const isModule = type === 'module';
 
             s.onload = () => resolve();
             s.onerror = () => resolve();
 
-            if (!old.src) {
-                s.text = old.text || old.innerHTML || '';
+            if (!script.src) {
+                s.text = script.text || script.innerHTML || '';
             } else {
                 s.async = false;
                 s.defer = false;
             }
 
-            if (old.parentNode) old.parentNode.replaceChild(s, old);
+            if (script.parentNode) script.parentNode.replaceChild(s, script);
 
-            if (!old.src && !isModule) {
+            if (!script.src && !isModule) {
                 setTimeout(resolve, 0);
             }
         }));

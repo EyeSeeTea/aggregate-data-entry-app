@@ -18,7 +18,7 @@ export const CustomForm = ({ dataSet }) => {
     useRunCustomFormScripts({
         containerRef,
         dataSetId: dataSet.id
-    }, [customForm.htmlCode, dataSet.id])
+    }, [customForm?.htmlCode, dataSet.id])
 
 
     return customForm ? (
