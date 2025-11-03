@@ -4,7 +4,7 @@ import useCustomForm from '../../custom-forms/use-custom-form.js'
 import { useMetadata } from '../../shared/index.js'
 import styles from './custom-form.module.css'
 import { parseHtmlToReact } from './parse-html-to-react.jsx'
-import { useRunCustomFormScripts } from "../../shared/legacy-dhis2-bridge/use-run-scripts";
+import { useRunInlineScripts } from "../../shared/legacy-dhis2-bridge/use-run-inline-scripts";
 
 export const CustomForm = ({ dataSet }) => {
     const { data: customForm } = useCustomForm({
@@ -15,7 +15,7 @@ export const CustomForm = ({ dataSet }) => {
 
     const containerRef = useRef(null)
 
-    useRunCustomFormScripts({
+    useRunInlineScripts({
         containerRef,
         dataSetId: dataSet.id
     }, [customForm?.htmlCode, dataSet.id])
