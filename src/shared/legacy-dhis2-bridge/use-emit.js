@@ -1,5 +1,20 @@
-import { useCallback, useEffect, useRef } from "react";
-import { useCustomEvent } from "./useCustomEvent";
+import { useCallback, useEffect, useRef } from 'react'
+
+export function useCustomEvent(opts) {
+    const { target = typeof window !== 'undefined' ? window : null } =
+        opts || {}
+
+    return useCallback(
+        (type, detail) => {
+            if (!target) return false
+            const evt = new CustomEvent(type, {
+                detail
+            })
+            return target.dispatchEvent(evt)
+        },
+        [target]
+    )
+}
 
 export function useEmitOnSet(setFn, { eventName, target, mapDetail }) {
     const emit = useCustomEvent({ target });
@@ -13,14 +28,15 @@ export function useEmitOnSet(setFn, { eventName, target, mapDetail }) {
 
 export function useEmitOnChange(value, { eventName, target, mapDetail, fireOnMount = false }) {
     const emit = useCustomEvent({ target });
-    const first = useRef(true);
+    const isFirstRender = useRef(true);
 
     useEffect(() => {
-        if (!fireOnMount && first.current) {
-            first.current = false;
-            return;
+        if (isFirstRender.current) {
+            isFirstRender.current = false;
+            if (!fireOnMount) {
+                return;
+            }
         }
-        first.current = false;
 
         const detail = typeof mapDetail === "function" ? mapDetail(value) : value;
         emit(eventName, detail);
