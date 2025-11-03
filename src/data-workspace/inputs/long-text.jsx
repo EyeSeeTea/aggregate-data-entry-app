@@ -47,6 +47,7 @@ export const LongText = ({
 
     return (
         <textarea
+            id={`${deId}-${cocId}`}
             className={styles.longText}
             rows="4"
             value={value ?? ''}
