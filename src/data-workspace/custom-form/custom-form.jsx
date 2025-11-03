@@ -1,12 +1,10 @@
 import PropTypes from 'prop-types'
-import React, { useEffect, useRef } from 'react'
+import React, { useRef } from 'react'
 import useCustomForm from '../../custom-forms/use-custom-form.js'
 import { useMetadata } from '../../shared/index.js'
 import styles from './custom-form.module.css'
 import { parseHtmlToReact } from './parse-html-to-react.jsx'
-import { useLegacyDhis2BridgeContext } from '../../shared/legacy-dhis2-bridge/legacy-dhis2-bridge-provider'
-import { DE_EVENTS } from '../../shared/legacy-dhis2-bridge/legacy-events'
-import {useRunCustomFormScripts} from "../../shared/legacy-dhis2-bridge/use-run-scripts";
+import { useRunCustomFormScripts } from "../../shared/legacy-dhis2-bridge/use-run-scripts";
 
 export const CustomForm = ({ dataSet }) => {
     const { data: customForm } = useCustomForm({
@@ -14,7 +12,6 @@ export const CustomForm = ({ dataSet }) => {
         version: dataSet.version,
     })
     const { data: metadata } = useMetadata()
-    const { emit } = useLegacyDhis2BridgeContext()
 
     const containerRef = useRef(null)
 

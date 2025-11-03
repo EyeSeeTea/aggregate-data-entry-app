@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useMemo } from 'react'
+import React, { createContext, useContext, useEffect } from 'react'
 import { DE_EVENTS, FIELD_EVENTS } from './legacy-events.js'
 import {
     usePeriod,
@@ -6,7 +6,7 @@ import {
     useOrgUnitId,
     usePeriodId,
 } from '../index.js'
-import { useEmitOnChange } from "./use-emit";
+import {useCustomEvent, useEmitOnChange} from "./use-emit";
 
 const LegacyDhis2BridgeContext = createContext(undefined)
 
@@ -49,15 +49,9 @@ export function useLegacyDhis2BridgeContext() {
 }
 
 function useLegacyDhis2Bridge() {
-    const emit = useMemo(() => {
-        return (type, detail) => {
-            if (typeof window === 'undefined') {
-                return false
-            }
-            const event = new CustomEvent(type, { detail })
-            return window.dispatchEvent(event)
-        }
-    }, [])
+    const emit = useCustomEvent({
+        target: typeof window !== 'undefined' ? window : null,
+    });
 
     return {
         dhis2: typeof window !== 'undefined' ? window.dhis2 : undefined,
