@@ -8,7 +8,10 @@ import { getFieldId } from '../get-field-id.jsx'
 import { TableBodyHiddenByFiltersRow } from '../table-body-hidden-by-filter-row.jsx'
 import styles from '../table-body.module.css'
 import { CategoryComboTableBodyHeader } from './category-combo-table-body-header.jsx'
+import { CategoryComboTableBodyHeaderVisible } from './category-combo-table-body-header-visible.jsx'
+import { ColumnTotalsVisibleWithFullSum } from './column-totals-visible-with-full-sum.jsx'
 import { DataElementCell } from './data-element-cell.jsx'
+import { getVisibleCOCs } from './get-visible-cocs.js'
 import { ColumnTotals, RowTotal } from './total-cells.jsx'
 
 export const CategoryComboTableBody = React.memo(
@@ -34,6 +37,17 @@ export const CategoryComboTableBody = React.memo(
             metadata,
             categoryCombo.id
         )
+        const visibleCOCs = useMemo(
+            () =>
+                getVisibleCOCs({
+                    sortedCOCs,
+                    dataElements,
+                    greyedFields,
+                    getFieldId,
+                }),
+            [sortedCOCs, dataElements, greyedFields]
+        )
+        const hasGreyedColumnsHidden = visibleCOCs.length !== sortedCOCs.length
 
         const checkTableActive = useCallback(
             (activeDeId) => dataElements.some(({ id }) => id === activeDeId),
@@ -78,16 +92,29 @@ export const CategoryComboTableBody = React.memo(
                     [styles.sectionRowCollapsed]: collapsed,
                 })}
             >
-                <CategoryComboTableBodyHeader
-                    categoryOptionCombos={sortedCOCs}
-                    categories={categories}
-                    renderRowTotals={renderRowTotals}
-                    hideRowTotalsDueToNonNumberValueTypes={
-                        hideRowTotalsDueToNonNumberValueTypes
-                    }
-                    paddingCells={paddingCells}
-                    checkTableActive={checkTableActive}
-                />
+                {hasGreyedColumnsHidden ? (
+                    <CategoryComboTableBodyHeaderVisible
+                        categoryOptionCombos={visibleCOCs}
+                        categories={categories}
+                        renderRowTotals={renderRowTotals}
+                        hideRowTotalsDueToNonNumberValueTypes={
+                            hideRowTotalsDueToNonNumberValueTypes
+                        }
+                        paddingCells={paddingCells}
+                        checkTableActive={checkTableActive}
+                    />
+                ) : (
+                    <CategoryComboTableBodyHeader
+                        categoryOptionCombos={sortedCOCs}
+                        categories={categories}
+                        renderRowTotals={renderRowTotals}
+                        hideRowTotalsDueToNonNumberValueTypes={
+                            hideRowTotalsDueToNonNumberValueTypes
+                        }
+                        paddingCells={paddingCells}
+                        checkTableActive={checkTableActive}
+                    />
+                )}
                 {dataElements.map((de, i) => {
                     const hidden = filteredDeIds.has(de.id)
                     return (
@@ -100,7 +127,7 @@ export const CategoryComboTableBody = React.memo(
                             className={cx({ [styles.hidden]: hidden })}
                         >
                             <DataElementCell dataElement={de} />
-                            {sortedCOCs.map((coc) => (
+                            {visibleCOCs.map((coc) => (
                                 <DataEntryCell key={coc.id}>
                                     <DataEntryField
                                         dataElement={de}
@@ -138,14 +165,28 @@ export const CategoryComboTableBody = React.memo(
                 })}
                 {renderColumnTotals &&
                     !hideColumnTotalsDueToNonNumberValueType && (
-                        <ColumnTotals
-                            paddingCells={paddingCells}
-                            renderTotalSum={
-                                renderRowTotals && renderColumnTotals
-                            }
-                            dataElements={dataElements}
-                            categoryOptionCombos={sortedCOCs}
-                        />
+                        <>
+                            {hasGreyedColumnsHidden ? (
+                                <ColumnTotalsVisibleWithFullSum
+                                    paddingCells={paddingCells}
+                                    renderTotalSum={
+                                        renderRowTotals && renderColumnTotals
+                                    }
+                                    dataElements={dataElements}
+                                    visibleCategoryOptionCombos={visibleCOCs}
+                                    categoryOptionCombos={sortedCOCs}
+                                />
+                            ) : (
+                                <ColumnTotals
+                                    paddingCells={paddingCells}
+                                    renderTotalSum={
+                                        renderRowTotals && renderColumnTotals
+                                    }
+                                    dataElements={dataElements}
+                                    categoryOptionCombos={sortedCOCs}
+                                />
+                            )}
+                        </>
                     )}
                 {hiddenItemsCount > 0 && (
                     <TableBodyHiddenByFiltersRow
