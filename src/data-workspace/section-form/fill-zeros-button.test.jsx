@@ -12,6 +12,7 @@ const mockInvalidateQueries = jest.fn()
 const mockSetInitialDataValues = jest.fn()
 const mockGetInitialDataValues = jest.fn(() => ({ values: {} }))
 const mockGetDataValue = jest.fn(() => undefined)
+const mockGetDataValues = jest.fn(() => ({}))
 
 jest.mock('@dhis2/app-runtime', () => ({
     useDataEngine: () => ({ mutate: mockMutate }),
@@ -38,6 +39,7 @@ jest.mock('../../shared/index.js', () => ({
             getInitialDataValues: mockGetInitialDataValues,
             setInitialDataValues: mockSetInitialDataValues,
             getDataValue: mockGetDataValue,
+            getDataValues: mockGetDataValues,
         })
     ),
 }))
@@ -68,6 +70,7 @@ describe('FillZerosButton', () => {
         mockSetInitialDataValues.mockClear()
         mockGetInitialDataValues.mockReturnValue({ values: {} })
         mockGetDataValue.mockReturnValue(undefined)
+        mockGetDataValues.mockReturnValue({})
         useIsOrgUnitClosed.mockReturnValue(false)
         useZeroFillCandidates.mockReturnValue([
             { dataElementId: 'de1', categoryOptionComboId: 'coc1' },
@@ -291,6 +294,12 @@ describe('FillZerosButton', () => {
             },
         })
 
+        mockGetDataValues.mockReturnValue({
+            de1: { coc1: { value: '' } },
+            de2: { coc2: { value: '' } },
+            de3: { coc3: { value: '5' } },
+        })
+
         useZeroFillCandidates.mockReturnValue([
             { dataElementId: 'de1', categoryOptionComboId: 'coc1' },
             { dataElementId: 'de2', categoryOptionComboId: 'coc2' },
@@ -337,6 +346,48 @@ describe('FillZerosButton', () => {
                 de1: { coc1: '0' },
                 de2: { coc2: '0' },
                 de3: { coc3: '5' },
+            },
+            'form-key-1'
+        )
+    })
+
+    it('should not restore stale values for non-eligible fields', async () => {
+        mockGetInitialDataValues.mockReturnValue({
+            values: {
+                de1: { coc1: '1' },
+                de2: { coc2: '2' },
+                de3: { coc3: '0' },
+                de4: { coc4: '0' },
+            },
+        })
+
+        mockGetDataValues.mockReturnValue({
+            de1: { coc1: { value: '1' } },
+            de2: { coc2: { value: '' } },
+            de3: { coc3: { value: '' } },
+            de4: { coc4: { value: '' } },
+        })
+
+        useZeroFillCandidates.mockReturnValue([
+            { dataElementId: 'de1', categoryOptionComboId: 'coc1' },
+            { dataElementId: 'de3', categoryOptionComboId: 'coc3' },
+            { dataElementId: 'de4', categoryOptionComboId: 'coc4' },
+        ])
+
+        render(<FillZerosButton dataSetId="ds1" sectionId="sec1" />)
+
+        fireEvent.click(screen.getByText('Fill with zeros'))
+
+        await waitFor(() => {
+            expect(mockMutate).toHaveBeenCalledTimes(2)
+        })
+
+        expect(mockSetInitialDataValues).toHaveBeenCalledWith(
+            {
+                de1: { coc1: '1' },
+                de2: { coc2: '' },
+                de3: { coc3: '0' },
+                de4: { coc4: '0' },
             },
             'form-key-1'
         )

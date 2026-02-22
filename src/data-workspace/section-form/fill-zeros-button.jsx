@@ -21,6 +21,31 @@ const SET_DATA_VALUE_MUTATION = {
     data: (data) => data,
 }
 
+const normalizeValueForInput = (value) => {
+    if (value === undefined || value === null) {
+        return value
+    }
+
+    return String(value)
+}
+
+const mapDataValuesStoreToInitialValues = (dataValues = {}) =>
+    Object.entries(dataValues).reduce(
+        (acc, [dataElementId, categoryOptionCombos]) => ({
+            ...acc,
+            [dataElementId]: Object.entries(categoryOptionCombos || {}).reduce(
+                (innerAcc, [categoryOptionComboId, dataValue]) => ({
+                    ...innerAcc,
+                    [categoryOptionComboId]: normalizeValueForInput(
+                        dataValue?.value
+                    ),
+                }),
+                {}
+            ),
+        }),
+        {}
+    )
+
 const buildZeroMutationVariables = ({
     dataElementId,
     categoryOptionComboId,
@@ -69,6 +94,7 @@ export const FillZerosButton = ({
         (state) => state.setInitialDataValues
     )
     const getDataValue = useValueStore((state) => state.getDataValue)
+    const getDataValues = useValueStore((state) => state.getDataValues)
 
     const showButton = !isOrgUnitClosed && zeroFillCandidates.length > 0
 
@@ -82,6 +108,14 @@ export const FillZerosButton = ({
         try {
             const currentInitialDataValues =
                 getInitialDataValues()?.values || {}
+            const currentStoreDataValues = mapDataValuesStoreToInitialValues(
+                getDataValues()
+            )
+            const hasCurrentStoreValues =
+                Object.keys(currentStoreDataValues).length > 0
+            const currentBaseValues = hasCurrentStoreValues
+                ? currentStoreDataValues
+                : currentInitialDataValues
             const candidateValuesByFieldId = new Map()
 
             const emptyCandidates = zeroFillCandidates.filter(
@@ -101,7 +135,7 @@ export const FillZerosButton = ({
                     })
                     const currentValue =
                         currentDataValue?.value ??
-                        currentInitialDataValues[dataElementId]?.[
+                        currentBaseValues[dataElementId]?.[
                             categoryOptionComboId
                         ]
                     candidateValuesByFieldId.set(fieldId, currentValue)
@@ -135,7 +169,7 @@ export const FillZerosButton = ({
                 )
             )
 
-            const nextInitialDataValues = { ...currentInitialDataValues }
+            const nextInitialDataValues = { ...currentBaseValues }
 
             zeroFillCandidates.forEach(
                 ({ dataElementId, categoryOptionComboId }) => {
@@ -185,6 +219,7 @@ export const FillZerosButton = ({
         attributeOptions,
         getInitialDataValues,
         getDataValue,
+        getDataValues,
         setInitialDataValues,
         formKey,
         onFillComplete,
