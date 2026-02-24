@@ -3,7 +3,7 @@ import i18n from '@dhis2/d2-i18n'
 import { Button } from '@dhis2/ui'
 import { useQueryClient } from '@tanstack/react-query'
 import PropTypes from 'prop-types'
-import React, { useCallback, useState } from 'react'
+import { useCallback, useState } from 'react'
 import { useValueStore } from '../../shared/index.js'
 import { useApiAttributeParams } from '../../shared/use-api-attribute-params.js'
 import {
@@ -46,7 +46,7 @@ const mapDataValuesStoreToInitialValues = (dataValues = {}) =>
         {}
     )
 
-const buildZeroMutationVariables = ({
+const buildDataValues = ({
     dataElementId,
     categoryOptionComboId,
     dataSetId,
@@ -156,7 +156,7 @@ export const FillZerosButton = ({
                 emptyCandidates.map(
                     ({ dataElementId, categoryOptionComboId }) =>
                         engine.mutate(SET_DATA_VALUE_MUTATION, {
-                            variables: buildZeroMutationVariables({
+                            variables: buildDataValues({
                                 dataElementId,
                                 categoryOptionComboId,
                                 dataSetId,
@@ -252,4 +252,4 @@ FillZerosButton.propTypes = {
     onFillComplete: PropTypes.func,
 }
 
-export { buildZeroMutationVariables }
+export { buildDataValues as buildZeroMutationVariables }
