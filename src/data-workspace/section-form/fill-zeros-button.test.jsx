@@ -13,9 +13,11 @@ const mockSetInitialDataValues = jest.fn()
 const mockGetInitialDataValues = jest.fn(() => ({ values: {} }))
 const mockGetDataValue = jest.fn(() => undefined)
 const mockGetDataValues = jest.fn(() => ({}))
+const mockShowErrorAlert = jest.fn()
 
 jest.mock('@dhis2/app-runtime', () => ({
     useDataEngine: () => ({ mutate: mockMutate }),
+    useAlert: jest.fn(() => ({ show: mockShowErrorAlert })),
 }))
 
 jest.mock('@tanstack/react-query', () => ({
@@ -68,6 +70,7 @@ describe('FillZerosButton', () => {
         mockMutate.mockResolvedValue({})
         mockInvalidateQueries.mockResolvedValue({})
         mockSetInitialDataValues.mockClear()
+        mockShowErrorAlert.mockClear()
         mockGetInitialDataValues.mockReturnValue({ values: {} })
         mockGetDataValue.mockReturnValue(undefined)
         mockGetDataValues.mockReturnValue({})
@@ -412,5 +415,30 @@ describe('FillZerosButton', () => {
             pe: '202401',
             value: '0',
         })
+    })
+
+    it('should show an error alert and reset loading when save fails', async () => {
+        const onFillComplete = jest.fn()
+        mockMutate.mockRejectedValue(new Error('Network error'))
+
+        render(
+            <FillZerosButton
+                dataSetId="ds1"
+                sectionId="sec1"
+                onFillComplete={onFillComplete}
+            />
+        )
+
+        const button = screen.getByText('Fill with zeros')
+        fireEvent.click(button)
+
+        await waitFor(() => {
+            expect(mockShowErrorAlert).toHaveBeenCalledTimes(1)
+        })
+
+        expect(button).not.toBeDisabled()
+        expect(mockSetInitialDataValues).not.toHaveBeenCalled()
+        expect(onFillComplete).not.toHaveBeenCalled()
+        expect(mockInvalidateQueries).toHaveBeenCalledWith(['dataValueSet'])
     })
 })

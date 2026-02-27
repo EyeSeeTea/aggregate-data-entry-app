@@ -1,4 +1,4 @@
-import { useDataEngine } from '@dhis2/app-runtime'
+import { useAlert, useDataEngine } from '@dhis2/app-runtime'
 import i18n from '@dhis2/d2-i18n'
 import { Button } from '@dhis2/ui'
 import { useQueryClient } from '@tanstack/react-query'
@@ -20,6 +20,10 @@ const SET_DATA_VALUE_MUTATION = {
     type: 'create',
     data: (data) => data,
 }
+
+const fillWithZerosFailedMessage = i18n.t(
+    'Error occurred while saving dataValues'
+)
 
 const normalizeValueForInput = (value) => {
     if (value === undefined || value === null) {
@@ -81,6 +85,9 @@ export const FillZerosButton = ({
     const [isSaving, setIsSaving] = useState(false)
     const queryClient = useQueryClient()
     const engine = useDataEngine()
+    const { show: showErrorAlert } = useAlert((message) => message, {
+        critical: true,
+    })
     const dataValueSetQueryKey = useDataValueSetQueryKey()
     const formKey = useContextSelectionId()
     const [{ orgUnitId, periodId }] = useContextSelection()
@@ -205,6 +212,9 @@ export const FillZerosButton = ({
             onFillComplete?.()
 
             await queryClient.invalidateQueries(dataValueSetQueryKey)
+        } catch {
+            showErrorAlert(fillWithZerosFailedMessage)
+            await queryClient.invalidateQueries(dataValueSetQueryKey)
         } finally {
             setIsSaving(false)
         }
@@ -224,6 +234,7 @@ export const FillZerosButton = ({
         formKey,
         onFillComplete,
         greyedFields,
+        showErrorAlert,
         queryClient,
         dataValueSetQueryKey,
     ])
