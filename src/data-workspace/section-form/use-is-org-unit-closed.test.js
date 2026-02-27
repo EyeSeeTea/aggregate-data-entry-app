@@ -1,6 +1,6 @@
 import { isOrgUnitClosedForPeriod } from './use-is-org-unit-closed.js'
 
-describe('use-is-org-unit-closed', () => {
+describe('isOrgUnitClosedForPeriod', () => {
     it('should return false when there is no closed date', () => {
         expect(
             isOrgUnitClosedForPeriod({

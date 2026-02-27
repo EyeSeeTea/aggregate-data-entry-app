@@ -16,7 +16,6 @@ export const isZeroFillDataElement = (dataElement) =>
 
 export const getZeroFillCandidates = ({ metadata, dataSetId, sectionId }) => {
     if (!metadata || !dataSetId || !sectionId) {
-        console.log('metadata', metadata, dataSetId, sectionId)
         return []
     }
 

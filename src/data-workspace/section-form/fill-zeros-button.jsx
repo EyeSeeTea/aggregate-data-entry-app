@@ -3,7 +3,7 @@ import i18n from '@dhis2/d2-i18n'
 import { Button } from '@dhis2/ui'
 import { useQueryClient } from '@tanstack/react-query'
 import PropTypes from 'prop-types'
-import { useCallback, useState } from 'react'
+import React, { useCallback, useState } from 'react'
 import { useValueStore } from '../../shared/index.js'
 import { useApiAttributeParams } from '../../shared/use-api-attribute-params.js'
 import {
