@@ -49,9 +49,9 @@ export const ColumnTotalsVisibleWithFullSum = ({
 }
 
 ColumnTotalsVisibleWithFullSum.propTypes = {
+    categoryOptionCombos: PropTypes.array,
     dataElements: PropTypes.array,
     paddingCells: PropTypes.array,
     renderTotalSum: PropTypes.bool,
-    categoryOptionCombos: PropTypes.array,
     visibleCategoryOptionCombos: PropTypes.array,
 }

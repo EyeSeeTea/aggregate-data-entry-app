@@ -235,4 +235,50 @@ describe('<CategoryComboTableBody /> greyed columns', () => {
         const gtOneHeaders = result.getAllByText('>1y')
         expect(gtOneHeaders.length).toBe(2)
     })
+
+    it('should not render cells when all columns marked as greyed fields', () => {
+        const tableDataElements = [dataElements.s46m5MS0hxu]
+        const greyedFields = new Set([
+            's46m5MS0hxu.Prlt0C1RF0s',
+            's46m5MS0hxu.psbwp3CQEhs',
+            's46m5MS0hxu.V6L425pT3A0',
+            's46m5MS0hxu.hEFKSsPV5et',
+        ])
+
+        const result = render(
+            <Table>
+                <CategoryComboTableBody
+                    categoryCombo={categoryCombos.dzjKKQq0cSO}
+                    dataElements={tableDataElements}
+                    greyedFields={greyedFields}
+                    renderRowTotals
+                    renderColumnTotals
+                />
+            </Table>,
+            {
+                wrapper: ({ children }) => <>{children}</>,
+            }
+        )
+
+        const inputRows = result.getAllByTestId('dhis2-dataentry-tableinputrow')
+        const inputCells = result.queryAllByTestId(
+            'dhis2-dataentryapp-dataentrycell'
+        )
+        const rowTotalCell = getByTestId(
+            inputRows[0],
+            'dhis2-dataentry-totalcell'
+        )
+        const columnTotalsRow = result.getByTestId(
+            'dhis2-dataentry-columntotals'
+        )
+        const totalsCells = getAllByTestId(
+            columnTotalsRow,
+            'dhis2-dataentry-totalcell'
+        )
+
+        expect(inputCells.length).toBe(0)
+        expect(rowTotalCell.textContent).toBe('100')
+        expect(totalsCells.length).toBe(1)
+        expect(totalsCells[0].textContent).toBe('100')
+    })
 })
