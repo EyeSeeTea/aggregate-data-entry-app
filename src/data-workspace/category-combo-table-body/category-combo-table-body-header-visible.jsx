@@ -96,8 +96,8 @@ CategoryComboTableBodyHeaderVisible.propTypes = {
     categories: PropTypes.array,
     categoryOptionCombos: PropTypes.arrayOf(
         PropTypes.shape({
-            id: PropTypes.string,
             categoryOptions: PropTypes.arrayOf(PropTypes.string),
+            id: PropTypes.string,
         })
     ),
     checkTableActive: PropTypes.func,
