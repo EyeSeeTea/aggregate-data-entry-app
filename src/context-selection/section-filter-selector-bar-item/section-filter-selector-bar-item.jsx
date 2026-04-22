@@ -7,12 +7,14 @@ import {
     useDataSetId,
     useSectionFilter,
 } from '../../shared/index.js'
+import { usePluginOptions } from '../../shared/plugin-options/index.js'
 import { MenuSelect } from '../menu-select/index.js'
 import useOnDependentParamsChange from './use-on-dependent-params-change.js'
 import useSelectorBarItemValue from './use-selector-bar-item-value.js'
 import useShouldComponentRenderNull from './use-should-component-render-null.js'
 
 export default function SectionFilterSelectorBarItem() {
+    const { hideTabSectionSelector } = usePluginOptions()
     const [open, setOpen] = useState(false)
     const [sectionFilter, setSectionFilter] = useSectionFilter()
     const deselect = useCallback(
@@ -46,7 +48,7 @@ export default function SectionFilterSelectorBarItem() {
     }, [dataSet, sectionFilter, setSectionFilter])
 
     const shouldComponentRenderNull = useShouldComponentRenderNull()
-    if (shouldComponentRenderNull) {
+    if (shouldComponentRenderNull || hideTabSectionSelector) {
         return null
     }
 

@@ -6,6 +6,7 @@ import {
     useClearEntireSelection,
     useManageInterParamDependencies,
 } from '../../shared/index.js'
+import { usePluginOptions } from '../../shared/plugin-options/index.js'
 import { AttributeOptionComboSelectorBarItem } from '../attribute-option-combo-selector-bar-item/index.js'
 import { DataSetSelectorBarItem } from '../data-set-selector-bar-item/index.js'
 import { OrgUnitSetSelectorBarItem } from '../org-unit-selector-bar-item/index.js'
@@ -19,6 +20,7 @@ export default function ContextSelector({ setSelectionHasNoFormMessage }) {
     useManageInterParamDependencies()
 
     const { hide } = useRightHandPanelContext()
+    const { hideClearSelectionsButton } = usePluginOptions()
     const hideClearButton = useShouldHideClearButton()
     const clearEntireSelection = useClearEntireSelection()
     const onClearSelectionClick = () => {
@@ -33,7 +35,11 @@ export default function ContextSelector({ setSelectionHasNoFormMessage }) {
     return (
         <div className={styles.hideForPrint}>
             <SelectorBar
-                onClearSelectionClick={onClearSelectionClick}
+                onClearSelectionClick={
+                    hideClearSelectionsButton
+                        ? undefined
+                        : onClearSelectionClick
+                }
                 additionalContent={<RightHandSideContent />}
             >
                 <DataSetSelectorBarItem />
