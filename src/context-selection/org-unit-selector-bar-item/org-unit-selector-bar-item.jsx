@@ -2,7 +2,7 @@ import { useAlert } from '@dhis2/app-runtime'
 import i18n from '@dhis2/d2-i18n'
 import { SelectorBarItem, Divider, Tooltip } from '@dhis2/ui'
 import PropTypes from 'prop-types'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import {
     selectors,
     useMetadata,
@@ -17,11 +17,26 @@ import {
     OrganisationUnitTreeRootError,
     OrganisationUnitTreeRootLoading,
 } from './organisation-unit-tree/index.js'
+import useDataSetOrgUnitPaths from './use-data-set-org-unit-paths.js'
 import useExpandedState from './use-expanded-state.js'
 import useOrgUnitPathsByName from './use-org-unit-paths-by-name.js'
 import usePrefetchedOrganisationUnits from './use-prefetched-organisation-units.js'
 import useSelectorBarItemValue from './use-select-bar-item-value.js'
 import useUserOrgUnits from './use-user-org-units.js'
+
+function useTreeFilterPaths(dataSetId, dataSetOrgUnitPaths, filter, filteredOrgUnitPaths) {
+    return useMemo(() => {
+        if (dataSetId && filter) {
+            const dataSetPathSet = new Set(dataSetOrgUnitPaths.data || [])
+            return (filteredOrgUnitPaths || []).filter((path) =>
+                dataSetPathSet.has(path)
+            )
+        } else if (dataSetId) {
+            return dataSetOrgUnitPaths.data || []
+        }
+        return filteredOrgUnitPaths || []
+    }, [dataSetId, dataSetOrgUnitPaths.data, filter, filteredOrgUnitPaths])
+}
 
 const UnclickableLabel = ({ label }) => {
     return (
@@ -64,13 +79,24 @@ export default function OrganisationUnitSetSelectorBarItem() {
 
     const orgUnit = useOrgUnit()
     const userOrgUnits = useUserOrgUnits()
+    const dataSetOrgUnitPaths = useDataSetOrgUnitPaths()
 
     const selectorBarItemValue = useSelectorBarItemValue()
     const selected = orgUnit.data ? [orgUnit.data.path] : []
     const filteredOrgUnitPaths = filter ? orgUnitPathsByName.data : []
+
+    const treeFilterPaths = useTreeFilterPaths(
+        dataSetId,
+        dataSetOrgUnitPaths,
+        filter,
+        filteredOrgUnitPaths
+    )
+
     const orgUnitPathsByNameLoading =
         // offline levels need to be prefetched before rendering the org-unit-tree
         prefetchedOrganisationUnits.loading ||
+        // dataset org unit paths must be loaded before filtering the tree
+        (!!dataSetId && dataSetOrgUnitPaths.loading) ||
         // Either a filter has been set but the hook
         // hasn't been called yet
         (filter !== '' && !orgUnitPathsByName.called) ||
@@ -124,19 +150,21 @@ export default function OrganisationUnitSetSelectorBarItem() {
 
                         {!orgUnitPathsByNameLoading &&
                             (orgUnitPathsByName.error ||
-                                prefetchedOrganisationUnits.error) && (
+                                prefetchedOrganisationUnits.error ||
+                                dataSetOrgUnitPaths.error) && (
                                 <OrganisationUnitTreeRootError
                                     dataTest="org-unit-selector-error"
                                     error={
                                         orgUnitPathsByName.error ||
-                                        prefetchedOrganisationUnits.error
+                                        prefetchedOrganisationUnits.error ||
+                                        dataSetOrgUnitPaths.error
                                     }
                                 />
                             )}
 
                         {!orgUnitPathsByNameLoading &&
                             !!filter &&
-                            !filteredOrgUnitPaths.length && (
+                            !treeFilterPaths.length && (
                                 <div data-test="org-unit-selector-none-found">
                                     {i18n.t(
                                         'No organisation units could be found'
@@ -145,11 +173,11 @@ export default function OrganisationUnitSetSelectorBarItem() {
                             )}
 
                         {!orgUnitPathsByNameLoading &&
-                            (!filter || !!filteredOrgUnitPaths.length) && (
+                            (!filter || !!treeFilterPaths.length) && (
                                 <OrganisationUnitTree
                                     dataTest="org-unit-selector-tree"
                                     singleSelection
-                                    filter={filteredOrgUnitPaths}
+                                    filter={treeFilterPaths}
                                     roots={userOrgUnits.data || []}
                                     selected={selected}
                                     expanded={expanded}
