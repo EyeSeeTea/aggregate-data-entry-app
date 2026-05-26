@@ -2,7 +2,7 @@ import { useAlert, useConfig } from '@dhis2/app-runtime'
 import i18n from '@dhis2/d2-i18n'
 import { getNowInCalendar } from '@dhis2/multi-calendar-dates'
 import { SelectorBarItem } from '@dhis2/ui'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import {
     selectors,
     useMetadata,
@@ -17,10 +17,22 @@ import DisabledTooltip from './disabled-tooltip.jsx'
 import PeriodMenu from './period-menu.jsx'
 import { useDateLimit } from './use-date-limit.js'
 import usePeriods from './use-periods.js'
+import usePeriodsWithCategoryOptions from './use-periods-with-category-options.js'
 import useSelectorBarItemValue from './use-select-bar-item-value.js'
 import YearNavigator from './year-navigator.jsx'
 
 export const PERIOD = 'PERIOD'
+
+function useDataInputFilteredPeriods(periods, dataSet) {
+    return useMemo(() => {
+        const dataInputPeriods = dataSet?.dataInputPeriods
+        if (!dataInputPeriods?.length) {
+            return periods
+        }
+        const validIds = new Set(dataInputPeriods.map((dip) => dip.period.id))
+        return periods.filter((p) => validIds.has(p.id))
+    }, [periods, dataSet?.dataInputPeriods])
+}
 
 const getYear = (date) => {
     // return null if date is undefined (for example)
@@ -85,6 +97,11 @@ export const PeriodSelectorBarItem = () => {
             ? currentFullYear
             : year,
     })
+
+    const filteredPeriods = useDataInputFilteredPeriods(periods, dataSet)
+
+    const periodsWithCategoryOptions =
+        usePeriodsWithCategoryOptions(filteredPeriods)
 
     useEffect(() => {
         const selectedPeriodYear = getYear(selectedPeriod?.startDate)
@@ -181,7 +198,7 @@ export const PeriodSelectorBarItem = () => {
                             )}
 
                             <PeriodMenu
-                                periods={periods}
+                                periods={periodsWithCategoryOptions}
                                 onChange={({ selected }) => {
                                     setPeriodId(selected)
                                     setPeriodOpen(false)
