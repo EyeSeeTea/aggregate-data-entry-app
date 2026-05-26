@@ -5,6 +5,7 @@ export const PluginOptionsContext = createContext({
     hideTabSectionSelector: false,
     hideClearSelectionsButton: false,
     hideFilterField: false,
+    hideUnassignedOrgUnits: false,
 })
 
 export const usePluginOptions = () => useContext(PluginOptionsContext)

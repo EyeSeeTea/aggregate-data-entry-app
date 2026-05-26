@@ -10,6 +10,7 @@ import {
     useOrgUnitId,
     useOrgUnit,
 } from '../../shared/index.js'
+import { usePluginOptions } from '../../shared/plugin-options/index.js'
 import DebouncedSearchInput from './debounced-search-input.jsx'
 import css from './org-unit-selector-bar-item.module.css'
 import {
@@ -80,13 +81,14 @@ export default function OrganisationUnitSetSelectorBarItem() {
     const orgUnit = useOrgUnit()
     const userOrgUnits = useUserOrgUnits()
     const dataSetOrgUnitPaths = useDataSetOrgUnitPaths()
+    const { hideUnassignedOrgUnits } = usePluginOptions()
 
     const selectorBarItemValue = useSelectorBarItemValue()
     const selected = orgUnit.data ? [orgUnit.data.path] : []
     const filteredOrgUnitPaths = filter ? orgUnitPathsByName.data : []
 
     const treeFilterPaths = useTreeFilterPaths(
-        dataSetId,
+        hideUnassignedOrgUnits ? dataSetId : undefined,
         dataSetOrgUnitPaths,
         filter,
         filteredOrgUnitPaths
@@ -96,7 +98,7 @@ export default function OrganisationUnitSetSelectorBarItem() {
         // offline levels need to be prefetched before rendering the org-unit-tree
         prefetchedOrganisationUnits.loading ||
         // dataset org unit paths must be loaded before filtering the tree
-        (!!dataSetId && dataSetOrgUnitPaths.loading) ||
+        (!!hideUnassignedOrgUnits && !!dataSetId && dataSetOrgUnitPaths.loading) ||
         // Either a filter has been set but the hook
         // hasn't been called yet
         (filter !== '' && !orgUnitPathsByName.called) ||
@@ -151,7 +153,8 @@ export default function OrganisationUnitSetSelectorBarItem() {
                         {!orgUnitPathsByNameLoading &&
                             (orgUnitPathsByName.error ||
                                 prefetchedOrganisationUnits.error ||
-                                dataSetOrgUnitPaths.error) && (
+                                (hideUnassignedOrgUnits &&
+                                    dataSetOrgUnitPaths.error)) && (
                                 <OrganisationUnitTreeRootError
                                     dataTest="org-unit-selector-error"
                                     error={
