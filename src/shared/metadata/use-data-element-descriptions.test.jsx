@@ -3,10 +3,7 @@ import { act, renderHook, waitFor } from '@testing-library/react'
 import React from 'react'
 import { Wrapper } from '../../test-utils/index.js'
 import { useDataSetId } from '../use-context-selection/use-context-selection.js'
-import {
-    chunk,
-    useDataElementDescriptions,
-} from './use-data-element-descriptions.js'
+import { useDataElementDescriptions } from './use-data-element-descriptions.js'
 import { useMetadata } from './use-metadata.js'
 
 jest.mock('../use-context-selection/use-context-selection.js', () => ({
@@ -32,7 +29,6 @@ const OTHER_DESCRIPTION = 'Number of BCG doses given'
 const REQUEST_FAILURE = 'Request failed'
 const REQUEST_CHUNK_SIZE = 100
 const ID_FILTER_PREFIX = 'id:in:['
-const LETTERS = ['a', 'b', 'c', 'd', 'e']
 
 const SELECTED_DATA_SET = [DATA_SET_ID]
 const NO_DATA_SET_SELECTED = [undefined]
@@ -63,7 +59,7 @@ const metadataQueryFor = (dataElementIds) => ({
 })
 
 const resolverReturning = (dataElementsForIds) =>
-    jest.fn((type, query) => ({
+    jest.fn((_type, query) => ({
         dataElements: dataElementsForIds(idsInFilter(query.params.filter)),
     }))
 
@@ -106,33 +102,6 @@ const renderDescriptions = ({
 
     return { result, queryCache }
 }
-
-describe('chunk', () => {
-    it('returns no chunks for an empty list', () => {
-        expect(chunk([], 2)).toEqual([])
-    })
-
-    it('returns a single chunk when the list is shorter than the size', () => {
-        expect(chunk(LETTERS, 10)).toEqual([['a', 'b', 'c', 'd', 'e']])
-    })
-
-    it('splits into equal chunks when the length is a multiple of the size', () => {
-        expect(chunk(LETTERS.slice(0, 4), 2)).toEqual([
-            ['a', 'b'],
-            ['c', 'd'],
-        ])
-    })
-
-    it('puts the remainder into a final, shorter chunk', () => {
-        expect(chunk(LETTERS, 2)).toEqual([['a', 'b'], ['c', 'd'], ['e']])
-    })
-
-    it('keeps every item exactly once and in order across chunks', () => {
-        const ids = generatedIds(250)
-
-        expect(chunk(ids, REQUEST_CHUNK_SIZE).flat()).toEqual(ids)
-    })
-})
 
 describe('useDataElementDescriptions', () => {
     it('maps each data element id to its description', async () => {
