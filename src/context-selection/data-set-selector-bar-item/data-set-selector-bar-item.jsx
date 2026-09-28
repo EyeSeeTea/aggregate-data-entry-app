@@ -15,6 +15,7 @@ import {
     useDataSetId,
     useOrgUnitId,
 } from '../../shared/index.js'
+import { usePluginOptions } from '../../shared/plugin-options/index.js'
 import styles from './data-set-selector-bar-item.module.css'
 
 const FiltrableMenuItems = ({
@@ -156,6 +157,7 @@ DataSetSelectorBarDropDownContent.propTypes = {
 }
 
 export default function DataSetSelectorBarItem() {
+    const { hideDataSetSelector } = usePluginOptions()
     const { data: metadata } = useMetadata()
     const [dataSetOpen, setDataSetOpen] = useState(false)
     const [dataSetId, setDataSetId] = useDataSetId()
@@ -180,6 +182,10 @@ export default function DataSetSelectorBarItem() {
             setDataSetId(dataSetIDs[0])
         }
     }, [dataSets, setDataSetId])
+
+    if (hideDataSetSelector) {
+        return null
+    }
 
     return (
         <div data-test="data-set-selector">

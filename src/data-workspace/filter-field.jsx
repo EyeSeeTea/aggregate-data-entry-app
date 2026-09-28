@@ -3,11 +3,18 @@ import { Button, InputField } from '@dhis2/ui'
 import classNames from 'classnames'
 import PropTypes from 'prop-types'
 import React from 'react'
+import { usePluginOptions } from '../shared/plugin-options/index.js'
 import { FORM_TYPES } from './constants.js'
 import styles from './entry-form.module.css'
 
 export default function FilterField({ value, setFilterText, formType }) {
+    const { hideFilterField } = usePluginOptions()
     const wrapperClasses = classNames(styles.filterWrapper, styles.hideForPrint)
+
+    if (hideFilterField) {
+        return null
+    }
+
     return (
         <div className={wrapperClasses}>
             <InputField

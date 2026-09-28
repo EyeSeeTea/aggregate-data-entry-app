@@ -1,3 +1,31 @@
+## [102.0.6](https://github.com/dhis2/aggregate-data-entry-app/compare/v102.0.5...v102.0.6) (2026-05-13)
+
+
+### Bug Fixes
+
+* dedupe dhis2-ui ([#558](https://github.com/dhis2/aggregate-data-entry-app/issues/558)) ([dda5851](https://github.com/dhis2/aggregate-data-entry-app/commit/dda58514ede0c38f1c5d9f1e9395ae918980af73))
+
+## [102.0.5](https://github.com/dhis2/aggregate-data-entry-app/compare/v102.0.4...v102.0.5) (2026-05-13)
+
+
+### Bug Fixes
+
+* use gregorian calendar for iso to handle chrome bug ([#557](https://github.com/dhis2/aggregate-data-entry-app/issues/557)) ([2de0805](https://github.com/dhis2/aggregate-data-entry-app/commit/2de0805ba4cbea829ed8b61b329b0baa5b614181))
+
+## [102.0.4](https://github.com/dhis2/aggregate-data-entry-app/compare/v102.0.3...v102.0.4) (2026-05-07)
+
+
+### Bug Fixes
+
+* useHighlightedFieldStore coc logic [DHIS2-20741] ([5635287](https://github.com/dhis2/aggregate-data-entry-app/commit/56352871faad48912b5dfe3ea99db16a1c1f6701))
+
+## [102.0.3](https://github.com/dhis2/aggregate-data-entry-app/compare/v102.0.2...v102.0.3) (2026-05-05)
+
+
+### Bug Fixes
+
+* show delete limits button [DHIS2-19517] ([#552](https://github.com/dhis2/aggregate-data-entry-app/issues/552)) ([8782429](https://github.com/dhis2/aggregate-data-entry-app/commit/8782429b9867b78c3a7af3b1cde91400d8fbc6f6))
+
 ## [102.0.2](https://github.com/dhis2/aggregate-data-entry-app/compare/v102.0.1...v102.0.2) (2026-04-14)
 
 

@@ -5,6 +5,11 @@
     block-size: 100% !important;
 }
 
+.fillWithZerosSection:not(:empty) {
+    padding-block-end: 1em;
+}
+
+
 @media print {
     .labelWrapper {
         background-color: transparent !important;

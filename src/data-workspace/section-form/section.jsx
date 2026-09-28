@@ -18,6 +18,7 @@ import { PivotedCategoryComboTableBody } from '../category-combo-table-body-pivo
 import { getFieldId } from '../get-field-id.jsx'
 import { IndicatorsTableBody } from '../indicators-table-body/indicators-table-body.jsx'
 import { getDisplayOptions } from './displayOptions.js'
+import { FillZerosButton } from './fill-zeros-button.jsx'
 import { SanitizedText } from './sanitized-text.jsx'
 import styles from './section.module.css'
 
@@ -30,6 +31,7 @@ export function SectionFormSection({
     // Could potentially build table via props instead of rendering children
     const [filterText, setFilterText] = useState('')
     const [showSectionContent, setShowSectionContent] = useState(true)
+    const [refreshCells, setRefreshCells] = useState(0)
 
     const { data } = useMetadata()
 
@@ -95,11 +97,24 @@ export function SectionFormSection({
         e.key === 'Enter' && onSectionHeadClicked()
     }
 
+    const fillZerosSectionClass = classNames(
+        styles.fillWithZerosSection,
+        styles.fillWithZerosSection
+    )
+
     return (
         <div>
             <SanitizedText className={styles.sectionDescription}>
                 {beforeSectionText}
             </SanitizedText>
+            <div className={fillZerosSectionClass}>
+                <FillZerosButton
+                    dataSetId={dataSetId}
+                    sectionId={section.id}
+                    greyedFields={greyedFields}
+                    onFillComplete={() => setRefreshCells((value) => value + 1)}
+                />
+            </div>
             <Table className={styles.table} suppressZebraStriping>
                 <TableHead>
                     <TableRowHead>
@@ -167,7 +182,7 @@ export function SectionFormSection({
                 {groupedDataElements.map(
                     ({ categoryCombo, dataElements }, i) => (
                         <TableComponent
-                            key={i} //if disableDataElementAutoGroup then duplicate catCombo-ids, so have to use index
+                            key={`${refreshCells}-${i}`} //if disableDataElementAutoGroup then duplicate catCombo-ids, so have to use index
                             categoryCombo={categoryCombo}
                             dataElements={dataElements}
                             filterText={filterText}
