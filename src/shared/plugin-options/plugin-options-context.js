@@ -8,6 +8,8 @@ export const PluginOptionsContext = createContext({
     hideUnassignedOrgUnits: false,
     // Restrict the data set selector to these IDs (undefined: no restriction)
     visibleDataSetIds: undefined,
+    // Restrict attribute category options to these IDs (undefined: no restriction)
+    visibleCategoryOptionIds: undefined,
 })
 
 export const usePluginOptions = () => useContext(PluginOptionsContext)

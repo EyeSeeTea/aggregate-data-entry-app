@@ -17,6 +17,7 @@ import useSelected from './use-selected.js'
 import useSelectorBarItemLabel from './use-selector-bar-item-label.js'
 import useSelectorBarItemValue from './use-selector-bar-item-value.js'
 import useShouldComponentRenderNull from './use-should-component-render-null.js'
+import { usePluginOptions } from '../../shared/plugin-options/index.js'
 
 const hasCategoryNoOptions = (category) => category.categoryOptions.length === 0
 
@@ -59,6 +60,7 @@ export default function AttributeOptionComboSelectorBarItem({
         useAttributeOptionComboSelection()
     const { systemInfo = {} } = useConfig()
     const { calendar = 'gregory' } = systemInfo
+    const { visibleCategoryOptionIds } = usePluginOptions()
     const { data: orgUnitData } = useOrgUnit()
     const orgUnitPath = orgUnitData?.path
 
@@ -69,7 +71,8 @@ export default function AttributeOptionComboSelectorBarItem({
             periodId,
             orgUnitId,
             orgUnitPath,
-            calendar
+            calendar,
+            visibleCategoryOptionIds
         )
 
     const [open, setOpen] = useState(false)
