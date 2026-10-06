@@ -10,6 +10,8 @@ export const PluginOptionsContext = createContext({
     visibleDataSetIds: undefined,
     // Restrict attribute category options to these IDs (undefined: no restriction)
     visibleCategoryOptionIds: undefined,
+    // Restrict the period selector to these IDs (undefined: no restriction)
+    visiblePeriodIds: undefined,
 })
 
 export const usePluginOptions = () => useContext(PluginOptionsContext)

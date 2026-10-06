@@ -13,6 +13,7 @@ import {
     yearlyFixedPeriodTypes,
     isDateAGreaterThanDateB,
 } from '../../shared/index.js'
+import { usePluginOptions } from '../../shared/plugin-options/index.js'
 import DisabledTooltip from './disabled-tooltip.jsx'
 import PeriodMenu from './period-menu.jsx'
 import { useDateLimit } from './use-date-limit.js'
@@ -98,7 +99,8 @@ export const PeriodSelectorBarItem = () => {
             : year,
     })
 
-    const filteredPeriods = useDataInputFilteredPeriods(periods, dataSet)
+    const dataInputPeriods = useDataInputFilteredPeriods(periods, dataSet)
+    const filteredPeriods = useVisiblePeriods(dataInputPeriods)
 
     const periodsWithCategoryOptions =
         usePeriodsWithCategoryOptions(filteredPeriods)
@@ -171,6 +173,8 @@ export const PeriodSelectorBarItem = () => {
         calendar,
     ])
 
+    useClearHiddenPeriodSelection()
+
     const selectorBarItemValue = useSelectorBarItemValue()
 
     return (
@@ -212,4 +216,34 @@ export const PeriodSelectorBarItem = () => {
             </DisabledTooltip>
         </div>
     )
+}
+
+// Periods restricted by the plugin option visiblePeriodIds (no restriction if undefined)
+function useVisiblePeriods(periods) {
+    const { visiblePeriodIds } = usePluginOptions()
+    const visiblePeriodIdsKey = visiblePeriodIds?.join(',')
+
+    return useMemo(() => {
+        if (!visiblePeriodIds) {
+            return periods
+        }
+        const visibleIds = new Set(visiblePeriodIds)
+        return periods.filter((period) => visibleIds.has(period.id))
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [periods, visiblePeriodIdsKey])
+}
+
+// Clear a selected period that is not visible (i.e. restored from an old URL)
+function useClearHiddenPeriodSelection() {
+    const { visiblePeriodIds } = usePluginOptions()
+    const [periodId, setPeriodId] = usePeriodId()
+    const isHidden = Boolean(
+        visiblePeriodIds && periodId && !visiblePeriodIds.includes(periodId)
+    )
+
+    useEffect(() => {
+        if (isHidden) {
+            setPeriodId(undefined)
+        }
+    }, [isHidden, setPeriodId])
 }
