@@ -8,7 +8,7 @@ import {
     SelectorBarItem,
 } from '@dhis2/ui'
 import PropTypes from 'prop-types'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import {
     selectors,
     useMetadata,
@@ -161,11 +161,7 @@ export default function DataSetSelectorBarItem() {
     const { data: metadata } = useMetadata()
     const [dataSetOpen, setDataSetOpen] = useState(false)
     const [dataSetId, setDataSetId] = useDataSetId()
-    const [orgUnitId] = useOrgUnitId()
-    const allDataSets = selectors.getDataSets(metadata)
-    const dataSets = orgUnitId
-        ? selectors.getDataSetsByOrgUnitId(metadata, orgUnitId)
-        : allDataSets
+    const { visibleDataSets, dataSets } = useVisibleDataSets()
     const selectableDataSets = Object.values(dataSets)
         .map(({ id, displayName }) => ({
             label: displayName,
@@ -182,6 +178,8 @@ export default function DataSetSelectorBarItem() {
             setDataSetId(dataSetIDs[0])
         }
     }, [dataSets, setDataSetId])
+
+    useClearHiddenDataSetSelection(visibleDataSets)
 
     if (hideDataSetSelector) {
         return null
@@ -209,7 +207,7 @@ export default function DataSetSelectorBarItem() {
                             setDataSetOpen(false)
                         }}
                         dataSetsAreRestricted={
-                            Object.keys(allDataSets)?.length !==
+                            Object.keys(visibleDataSets)?.length !==
                             Object.keys(dataSets)?.length
                         }
                     />
@@ -217,4 +215,57 @@ export default function DataSetSelectorBarItem() {
             </SelectorBarItem>
         </div>
     )
+}
+
+function filterDataSetsByIds(dataSets, ids) {
+    return Object.fromEntries(
+        ids.filter((id) => dataSets[id]).map((id) => [id, dataSets[id]])
+    )
+}
+
+/**
+ * Data sets restricted by the plugin option visibleDataSetIds (no restriction if undefined):
+ *   - visibleDataSets: all visible data sets.
+ *   - dataSets: visible data sets assigned to the selected org unit.
+ */
+function useVisibleDataSets() {
+    const { visibleDataSetIds } = usePluginOptions()
+    const { data: metadata } = useMetadata()
+    const [orgUnitId] = useOrgUnitId()
+    const allDataSets = selectors.getDataSets(metadata)
+    const dataSetsByOrgUnit = orgUnitId
+        ? selectors.getDataSetsByOrgUnitId(metadata, orgUnitId)
+        : allDataSets
+    const visibleDataSetIdsKey = visibleDataSetIds?.join(',')
+
+    return useMemo(
+        () =>
+            visibleDataSetIds
+                ? {
+                      visibleDataSets: filterDataSetsByIds(
+                          allDataSets,
+                          visibleDataSetIds
+                      ),
+                      dataSets: filterDataSetsByIds(
+                          dataSetsByOrgUnit,
+                          visibleDataSetIds
+                      ),
+                  }
+                : { visibleDataSets: allDataSets, dataSets: dataSetsByOrgUnit },
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+        [allDataSets, dataSetsByOrgUnit, visibleDataSetIdsKey]
+    )
+}
+
+// Clear a selected data set that is not visible (i.e. restored from an old URL)
+function useClearHiddenDataSetSelection(visibleDataSets) {
+    const { visibleDataSetIds } = usePluginOptions()
+    const [dataSetId, setDataSetId] = useDataSetId()
+    const isRestricted = Boolean(visibleDataSetIds)
+
+    useEffect(() => {
+        if (isRestricted && dataSetId && !visibleDataSets[dataSetId]) {
+            setDataSetId(undefined)
+        }
+    }, [isRestricted, visibleDataSets, dataSetId, setDataSetId])
 }
