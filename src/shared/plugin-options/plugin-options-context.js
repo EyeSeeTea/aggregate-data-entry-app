@@ -6,6 +6,8 @@ export const PluginOptionsContext = createContext({
     hideClearSelectionsButton: false,
     hideFilterField: false,
     hideUnassignedOrgUnits: false,
+    // Restrict the data set selector to these IDs (undefined: no restriction)
+    visibleDataSetIds: undefined,
 })
 
 export const usePluginOptions = () => useContext(PluginOptionsContext)
