@@ -12,12 +12,12 @@ import {
     useAttributeOptionComboSelection,
     useOrgUnit,
 } from '../../shared/index.js'
+import { usePluginOptions } from '../../shared/plugin-options/index.js'
 import CategoriesMenu from './categories-menu.jsx'
 import useSelected from './use-selected.js'
 import useSelectorBarItemLabel from './use-selector-bar-item-label.js'
 import useSelectorBarItemValue from './use-selector-bar-item-value.js'
 import useShouldComponentRenderNull from './use-should-component-render-null.js'
-import { usePluginOptions } from '../../shared/plugin-options/index.js'
 
 const hasCategoryNoOptions = (category) => category.categoryOptions.length === 0
 
