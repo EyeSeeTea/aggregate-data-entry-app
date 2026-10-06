@@ -13,11 +13,12 @@ import {
     yearlyFixedPeriodTypes,
     isDateAGreaterThanDateB,
 } from '../../shared/index.js'
+import { usePluginOptions } from '../../shared/plugin-options/index.js'
 import DisabledTooltip from './disabled-tooltip.jsx'
 import PeriodMenu from './period-menu.jsx'
 import { useDateLimit } from './use-date-limit.js'
-import usePeriods from './use-periods.js'
 import usePeriodsWithCategoryOptions from './use-periods-with-category-options.js'
+import usePeriods from './use-periods.js'
 import useSelectorBarItemValue from './use-select-bar-item-value.js'
 import YearNavigator from './year-navigator.jsx'
 
@@ -98,10 +99,13 @@ export const PeriodSelectorBarItem = () => {
             : year,
     })
 
-    const filteredPeriods = useDataInputFilteredPeriods(periods, dataSet)
+    const dataInputPeriods = useDataInputFilteredPeriods(periods, dataSet)
+    const filteredPeriods = useVisiblePeriods(dataInputPeriods)
 
     const periodsWithCategoryOptions =
         usePeriodsWithCategoryOptions(filteredPeriods)
+
+    const sortedPeriods = useSortedPeriods(periodsWithCategoryOptions)
 
     useEffect(() => {
         const selectedPeriodYear = getYear(selectedPeriod?.startDate)
@@ -171,6 +175,8 @@ export const PeriodSelectorBarItem = () => {
         calendar,
     ])
 
+    useClearHiddenPeriodSelection()
+
     const selectorBarItemValue = useSelectorBarItemValue()
 
     return (
@@ -198,7 +204,7 @@ export const PeriodSelectorBarItem = () => {
                             )}
 
                             <PeriodMenu
-                                periods={periodsWithCategoryOptions}
+                                periods={sortedPeriods}
                                 onChange={({ selected }) => {
                                     setPeriodId(selected)
                                     setPeriodOpen(false)
@@ -211,5 +217,45 @@ export const PeriodSelectorBarItem = () => {
                 </SelectorBarItem>
             </DisabledTooltip>
         </div>
+    )
+}
+
+// Periods restricted by the plugin option visiblePeriodIds (no restriction if undefined)
+function useVisiblePeriods(periods) {
+    const { visiblePeriodIds } = usePluginOptions()
+    const visiblePeriodIdsKey = visiblePeriodIds?.join(',')
+
+    return useMemo(() => {
+        if (!visiblePeriodIds) {
+            return periods
+        }
+        const visibleIds = new Set(visiblePeriodIds)
+        return periods.filter((period) => visibleIds.has(period.id))
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [periods, visiblePeriodIdsKey])
+}
+
+// Clear a selected period that is not visible (i.e. restored from an old URL)
+function useClearHiddenPeriodSelection() {
+    const { visiblePeriodIds } = usePluginOptions()
+    const [periodId, setPeriodId] = usePeriodId()
+    const isHidden = Boolean(
+        visiblePeriodIds && periodId && !visiblePeriodIds.includes(periodId)
+    )
+
+    useEffect(() => {
+        if (isHidden) {
+            setPeriodId(undefined)
+        }
+    }, [isHidden, setPeriodId])
+}
+
+// Periods are generated in descending order; reverse them if the plugin option periodsOrder is "asc"
+function useSortedPeriods(periods) {
+    const { periodsOrder } = usePluginOptions()
+
+    return useMemo(
+        () => (periodsOrder === 'asc' ? [...periods].reverse() : periods),
+        [periods, periodsOrder]
     )
 }

@@ -548,13 +548,16 @@ export const getCategoriesWithOptionsWithinPeriodWithOrgUnit =
         (_, __, ___, orgUnitId) => orgUnitId,
         (_, __, ___, ____, orgUnitPath) => orgUnitPath,
         (_, __, ___, ____, _____, calendar) => calendar,
+        (_, __, ___, ____, _____, ______, visibleCategoryOptionIds) =>
+            visibleCategoryOptionIds,
         (
             metadata,
             dataSet,
             periodId,
             orgUnitId,
             orgUnitPath,
-            calendar = 'gregory'
+            calendar = 'gregory',
+            visibleCategoryOptionIds
         ) => {
             if (!dataSet?.id || !periodId) {
                 return []
@@ -571,6 +574,17 @@ export const getCategoriesWithOptionsWithinPeriodWithOrgUnit =
                 relevantCategories,
                 categoryOptions
             )
+
+            // The default category combo has no selectable options to restrict
+            const isDefaultCategoryCombo = getCategoryComboByDataSetId(
+                metadata,
+                dataSet.id
+            )?.isDefault
+
+            const isOptionVisible = (categoryOption) =>
+                !visibleCategoryOptionIds ||
+                isDefaultCategoryCombo ||
+                visibleCategoryOptionIds.includes(categoryOption.id)
 
             let period
             try {
@@ -625,7 +639,8 @@ export const getCategoriesWithOptionsWithinPeriodWithOrgUnit =
                             categoryOption,
                             orgUnitId,
                             orgUnitPath,
-                        })
+                        }) &&
+                        isOptionVisible(categoryOption)
                 ),
             }))
         }

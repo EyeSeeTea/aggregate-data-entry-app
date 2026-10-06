@@ -12,6 +12,7 @@ import {
     useAttributeOptionComboSelection,
     useOrgUnit,
 } from '../../shared/index.js'
+import { usePluginOptions } from '../../shared/plugin-options/index.js'
 import CategoriesMenu from './categories-menu.jsx'
 import useSelected from './use-selected.js'
 import useSelectorBarItemLabel from './use-selector-bar-item-label.js'
@@ -59,6 +60,7 @@ export default function AttributeOptionComboSelectorBarItem({
         useAttributeOptionComboSelection()
     const { systemInfo = {} } = useConfig()
     const { calendar = 'gregory' } = systemInfo
+    const { visibleCategoryOptionIds } = usePluginOptions()
     const { data: orgUnitData } = useOrgUnit()
     const orgUnitPath = orgUnitData?.path
 
@@ -69,7 +71,8 @@ export default function AttributeOptionComboSelectorBarItem({
             periodId,
             orgUnitId,
             orgUnitPath,
-            calendar
+            calendar,
+            visibleCategoryOptionIds
         )
 
     const [open, setOpen] = useState(false)
@@ -102,7 +105,9 @@ export default function AttributeOptionComboSelectorBarItem({
                 .filter(({ id }) => id === categoryId)[0]
                 ?.categoryOptions.map(({ id }) => id)
             if (!relevantCategories.includes(categoryId)) {
-                resetAttributeOptionComboSelection(categoryId)
+                // The category does not belong to the data set (i.e. a selection kept from the
+                // previous data set, cleared in useHandleDataSetIdChange), so reset without warning
+                setAttributeOptionComboSelection(undefined)
                 return
             }
             if (
