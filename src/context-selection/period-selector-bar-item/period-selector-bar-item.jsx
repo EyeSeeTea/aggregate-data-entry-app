@@ -105,6 +105,8 @@ export const PeriodSelectorBarItem = () => {
     const periodsWithCategoryOptions =
         usePeriodsWithCategoryOptions(filteredPeriods)
 
+    const sortedPeriods = useSortedPeriods(periodsWithCategoryOptions)
+
     useEffect(() => {
         const selectedPeriodYear = getYear(selectedPeriod?.startDate)
         if (selectedPeriodYear) {
@@ -202,7 +204,7 @@ export const PeriodSelectorBarItem = () => {
                             )}
 
                             <PeriodMenu
-                                periods={periodsWithCategoryOptions}
+                                periods={sortedPeriods}
                                 onChange={({ selected }) => {
                                     setPeriodId(selected)
                                     setPeriodOpen(false)
@@ -246,4 +248,14 @@ function useClearHiddenPeriodSelection() {
             setPeriodId(undefined)
         }
     }, [isHidden, setPeriodId])
+}
+
+// Periods are generated in descending order; reverse them if the plugin option periodsOrder is "asc"
+function useSortedPeriods(periods) {
+    const { periodsOrder } = usePluginOptions()
+
+    return useMemo(
+        () => (periodsOrder === 'asc' ? [...periods].reverse() : periods),
+        [periods, periodsOrder]
+    )
 }

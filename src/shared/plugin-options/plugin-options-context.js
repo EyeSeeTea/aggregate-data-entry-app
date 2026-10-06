@@ -12,6 +12,8 @@ export const PluginOptionsContext = createContext({
     visibleCategoryOptionIds: undefined,
     // Restrict the period selector to these IDs (undefined: no restriction)
     visiblePeriodIds: undefined,
+    // Order of the periods in the period selector: "asc" | "desc"
+    periodsOrder: 'desc',
 })
 
 export const usePluginOptions = () => useContext(PluginOptionsContext)
