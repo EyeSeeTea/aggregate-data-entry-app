@@ -105,7 +105,9 @@ export default function AttributeOptionComboSelectorBarItem({
                 .filter(({ id }) => id === categoryId)[0]
                 ?.categoryOptions.map(({ id }) => id)
             if (!relevantCategories.includes(categoryId)) {
-                resetAttributeOptionComboSelection(categoryId)
+                // The category does not belong to the data set (i.e. a selection kept from the
+                // previous data set, cleared in useHandleDataSetIdChange), so reset without warning
+                setAttributeOptionComboSelection(undefined)
                 return
             }
             if (
