@@ -5,8 +5,8 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
-"POT-Creation-Date: 2026-05-21T08:02:54.840Z\n"
-"PO-Revision-Date: 2026-05-21T08:02:54.841Z\n"
+"POT-Creation-Date: 2026-10-21T15:45:36.322Z\n"
+"PO-Revision-Date: 2026-10-21T15:45:36.322Z\n"
 
 msgid "There was a problem loading metadata"
 msgstr "There was a problem loading metadata"
@@ -716,11 +716,3 @@ msgstr "Close details sidebar"
 
 msgid "Integer numbers have to be in the range from -2147483648 to 2147483647"
 msgstr "Integer numbers have to be in the range from -2147483648 to 2147483647"
-
-msgctxt "Application title"
-msgid "__MANIFEST_APP_TITLE"
-msgstr "Data Entry"
-
-msgctxt "Application description"
-msgid "__MANIFEST_APP_DESCRIPTION"
-msgstr ""
