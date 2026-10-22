@@ -16,6 +16,7 @@ import { useMetadata, selectors } from '../../shared/index.js'
 import { CategoryComboTableBody } from '../category-combo-table-body/index.js'
 import { PivotedCategoryComboTableBody } from '../category-combo-table-body-pivoted/index.js'
 import { getFieldId } from '../get-field-id.jsx'
+import { useGreyedFieldsAffectLayout } from '../greyed-fields-layout/index.js'
 import { IndicatorsTableBody } from '../indicators-table-body/indicators-table-body.jsx'
 import { getDisplayOptions } from './displayOptions.js'
 import { FillZerosButton } from './fill-zeros-button.jsx'
@@ -72,6 +73,8 @@ export function SectionFormSection({
             ),
         [section.greyedFields]
     )
+
+    const greyedFieldsAffectLayout = useGreyedFieldsAffectLayout(dataSetId)
 
     const filterInputId = `filter-input-${section.id}`
     const headerCellStyles = classNames(styles.headerCell, styles.hideForPrint)
@@ -191,6 +194,7 @@ export function SectionFormSection({
                             renderRowTotals={section.showRowTotals}
                             renderColumnTotals={section.showColumnTotals}
                             greyedFields={greyedFields}
+                            greyedFieldsAffectLayout={greyedFieldsAffectLayout}
                             displayOptions={displayOptions}
                             collapsed={!showSectionContent}
                         />
