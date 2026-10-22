@@ -22,6 +22,7 @@ export const CategoryComboTableBody = React.memo(
         filterText,
         globalFilterText,
         greyedFields,
+        greyedFieldsAffectLayout = true,
         maxColumnsInSection,
         renderRowTotals,
         renderColumnTotals,
@@ -38,15 +39,20 @@ export const CategoryComboTableBody = React.memo(
             metadata,
             categoryCombo.id
         )
+
+        const layoutGreyedFields = greyedFieldsAffectLayout
+            ? greyedFields
+            : undefined
+
         const visibleCOCs = useMemo(
             () =>
                 getVisibleCOCs({
                     sortedCOCs,
                     dataElements,
-                    greyedFields,
+                    greyedFields: layoutGreyedFields,
                     getFieldId,
                 }),
-            [sortedCOCs, dataElements, greyedFields]
+            [sortedCOCs, dataElements, layoutGreyedFields]
         )
         const hasGreyedColumnsHidden = visibleCOCs.length !== sortedCOCs.length
 
@@ -60,13 +66,13 @@ export const CategoryComboTableBody = React.memo(
                             isSubSectionDataElement({
                                 dataElement,
                                 sortedCOCs,
-                                greyedFields,
+                                greyedFields: layoutGreyedFields,
                                 getFieldId,
                             })
                         )
                         .map(({ id }) => id)
                 ),
-            [dataElements, sortedCOCs, greyedFields]
+            [dataElements, sortedCOCs, layoutGreyedFields]
         )
 
         const checkTableActive = useCallback(
@@ -240,6 +246,8 @@ CategoryComboTableBody.propTypes = {
     globalFilterText: PropTypes.string,
     /** Greyed fields is a Set where .has(fieldId) is true if that field is greyed/disabled */
     greyedFields: PropTypes.instanceOf(Set),
+    /** False when greyed fields must not hide columns nor mark sub-sections */
+    greyedFieldsAffectLayout: PropTypes.bool,
     maxColumnsInSection: PropTypes.number,
     renderColumnTotals: PropTypes.bool,
     renderRowTotals: PropTypes.bool,

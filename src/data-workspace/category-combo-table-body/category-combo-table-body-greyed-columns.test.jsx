@@ -282,3 +282,71 @@ describe('<CategoryComboTableBody /> greyed columns', () => {
         expect(totalsCells[0].textContent).toBe('100')
     })
 })
+
+describe('<CategoryComboTableBody /> Aggregation App exception', () => {
+    useMetadata.mockReturnValue({ data: metadata })
+    useDataSetId.mockReturnValue(['dataSet1'])
+
+    const ALL_GREYED = new Set([
+        's46m5MS0hxu.Prlt0C1RF0s',
+        's46m5MS0hxu.psbwp3CQEhs',
+        's46m5MS0hxu.V6L425pT3A0',
+        's46m5MS0hxu.hEFKSsPV5et',
+    ])
+    const NAME_CELL = 'dhis2-dataentryapp-dataelementcell'
+    const ENTRY_CELL = 'dhis2-dataentryapp-dataentrycell'
+    const SUB_SECTION_CLASS = 'subSectionName'
+
+    const renderAllGreyed = (props) =>
+        render(
+            <Table>
+                <CategoryComboTableBody
+                    categoryCombo={categoryCombos.dzjKKQq0cSO}
+                    dataElements={[dataElements.s46m5MS0hxu]}
+                    greyedFields={ALL_GREYED}
+                    {...props}
+                />
+            </Table>,
+            { wrapper: ({ children }) => <>{children}</> }
+        )
+
+    describe('when greyed fields affect the layout', () => {
+        it('hides every column', () => {
+            const result = renderAllGreyed()
+
+            expect(result.queryAllByTestId(ENTRY_CELL)).toHaveLength(0)
+        })
+
+        it('styles the fully greyed row as a sub-section', () => {
+            const result = renderAllGreyed()
+
+            expect(result.getByTestId(NAME_CELL)).toHaveClass(SUB_SECTION_CLASS)
+        })
+    })
+
+    describe('when they do not', () => {
+        const props = { greyedFieldsAffectLayout: false }
+
+        it('renders every column', () => {
+            const result = renderAllGreyed(props)
+
+            expect(result.getAllByTestId(ENTRY_CELL)).toHaveLength(4)
+        })
+
+        it('leaves those cells disabled', () => {
+            const result = renderAllGreyed(props)
+
+            const inputs = [...result.container.querySelectorAll('input')]
+            expect(inputs).toHaveLength(4)
+            expect(inputs.filter((input) => input.disabled)).toHaveLength(4)
+        })
+
+        it('does not style the fully greyed row as a sub-section', () => {
+            const result = renderAllGreyed(props)
+
+            expect(result.getByTestId(NAME_CELL)).not.toHaveClass(
+                SUB_SECTION_CLASS
+            )
+        })
+    })
+})
