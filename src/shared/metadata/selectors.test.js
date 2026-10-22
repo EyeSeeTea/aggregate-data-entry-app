@@ -1486,6 +1486,78 @@ describe('getCategoryOptionsByCategoryOptionComboId', () => {
             expect(actual).toEqual(expected)
         })
 
+        describe('with visibleCategoryOptionIds', () => {
+            const datasetid = 'dataset-id-1a'
+            const periodid = '202201'
+            const orgunitid = 'orgunit-id-z'
+            const orgunitpath = '/orgunit-id-x/orgunit-id-y/orgunit-id-z'
+            const catcomboid = 'categorycombo-id-1'
+
+            const getMetadata = ({ isDefault }) => ({
+                dataSets: {
+                    [datasetid]: {
+                        categoryCombo: { id: catcomboid },
+                        periodType: 'Monthly',
+                        id: datasetid,
+                    },
+                },
+                categoryCombos: {
+                    [catcomboid]: {
+                        id: catcomboid,
+                        isDefault,
+                        categories: ['co-id-letter'],
+                    },
+                },
+                categories: {
+                    'co-id-letter': {
+                        id: 'co-id-letter',
+                        categoryOptions: ['cat-id-a', 'cat-id-b', 'cat-id-c'],
+                    },
+                },
+                categoryOptions: {
+                    'cat-id-a': { id: 'cat-id-a' },
+                    'cat-id-b': { id: 'cat-id-b' },
+                    'cat-id-c': { id: 'cat-id-c' },
+                },
+            })
+
+            it('should return only the visible category options', () => {
+                const actual = getCategoriesWithOptionsWithinPeriodWithOrgUnit(
+                    getMetadata({ isDefault: false }),
+                    datasetid,
+                    periodid,
+                    orgunitid,
+                    orgunitpath,
+                    'gregory',
+                    ['cat-id-a', 'cat-id-c']
+                )
+
+                expect(actual).toEqual([
+                    {
+                        id: 'co-id-letter',
+                        categoryOptions: [
+                            { id: 'cat-id-a' },
+                            { id: 'cat-id-c' },
+                        ],
+                    },
+                ])
+            })
+
+            it('should not restrict the options of a default category combo', () => {
+                const actual = getCategoriesWithOptionsWithinPeriodWithOrgUnit(
+                    getMetadata({ isDefault: true }),
+                    datasetid,
+                    periodid,
+                    orgunitid,
+                    orgunitpath,
+                    'gregory',
+                    ['cat-id-a']
+                )
+
+                expect(actual[0].categoryOptions).toHaveLength(3)
+            })
+        })
+
         it('should return category options without endDate or with endDate after period end ', () => {
             const datasetid = 'dataset-id-1a'
             const periodid = '202201'

@@ -7,10 +7,12 @@ import {
     useOrgUnit,
     useOrgUnitId,
 } from '../../shared/index.js'
+import { usePluginOptions } from '../../shared/plugin-options/index.js'
 
 export default function usePeriodsWithCategoryOptions(periods) {
     const { systemInfo = {} } = useConfig()
     const { calendar = 'gregory' } = systemInfo
+    const { visibleCategoryOptionIds } = usePluginOptions()
     const { data: metadata } = useMetadata()
     const [dataSetId] = useDataSetId()
     const [orgUnitId] = useOrgUnitId()
@@ -36,11 +38,20 @@ export default function usePeriodsWithCategoryOptions(periods) {
                     period.id,
                     orgUnitId,
                     orgUnitPath,
-                    calendar
+                    calendar,
+                    visibleCategoryOptionIds
                 )
             return categoriesWithOptions.every(
                 (cat) => cat.categoryOptions.length > 0
             )
         })
-    }, [periods, orgUnitId, orgUnitPath, dataSetId, metadata, calendar])
+    }, [
+        periods,
+        orgUnitId,
+        orgUnitPath,
+        dataSetId,
+        metadata,
+        calendar,
+        visibleCategoryOptionIds,
+    ])
 }

@@ -4,6 +4,7 @@ import { createFixedPeriodFromPeriodId } from '@dhis2/multi-calendar-dates'
 import { useEffect, useState } from 'react'
 import { useMetadata, selectors } from '../metadata/index.js'
 import { periodTypesMapping } from '../period/index.js'
+import { usePluginOptions } from '../plugin-options/index.js'
 import { useOrgUnit } from '../use-org-unit/use-organisation-unit.js'
 import { filterObject } from '../utils.js'
 import {
@@ -133,6 +134,7 @@ function useHandleOrgUnitIdChange() {
         useAttributeOptionComboSelection()
     const { systemInfo = {} } = useConfig()
     const { calendar = 'gregory' } = systemInfo
+    const { visibleCategoryOptionIds } = usePluginOptions()
 
     const relevantCategoriesWithOptions =
         selectors.getCategoriesWithOptionsWithinPeriodWithOrgUnit(
@@ -141,7 +143,8 @@ function useHandleOrgUnitIdChange() {
             periodId,
             orgUnitId,
             orgUnitPath,
-            calendar
+            calendar,
+            visibleCategoryOptionIds
         )
 
     useEffect(() => {
@@ -219,6 +222,7 @@ function useHandlePeriodIdChange() {
     const [prevPeriodId, setPrevPeriodId] = useState(periodId)
     const { systemInfo = {} } = useConfig()
     const { calendar = 'gregory' } = systemInfo
+    const { visibleCategoryOptionIds } = usePluginOptions()
     const relevantCategoriesWithOptions =
         selectors.getCategoriesWithOptionsWithinPeriodWithOrgUnit(
             metadata,
@@ -226,7 +230,8 @@ function useHandlePeriodIdChange() {
             periodId,
             orgUnitId,
             orgUnitPath,
-            calendar
+            calendar,
+            visibleCategoryOptionIds
         )
 
     useEffect(() => {

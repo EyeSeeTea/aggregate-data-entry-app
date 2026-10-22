@@ -9,7 +9,6 @@
     padding-block-end: 1em;
 }
 
-
 @media print {
     .labelWrapper {
         background-color: transparent !important;

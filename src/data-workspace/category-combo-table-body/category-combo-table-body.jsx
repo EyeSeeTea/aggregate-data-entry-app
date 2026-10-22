@@ -12,6 +12,7 @@ import { CategoryComboTableBodyHeader } from './category-combo-table-body-header
 import { ColumnTotalsVisibleWithFullSum } from './column-totals-visible-with-full-sum.jsx'
 import { DataElementCell } from './data-element-cell.jsx'
 import { getVisibleCOCs } from './get-visible-cocs.js'
+import { isSubSectionDataElement } from './is-sub-section-data-element.js'
 import { ColumnTotals, RowTotal } from './total-cells.jsx'
 
 export const CategoryComboTableBody = React.memo(
@@ -48,6 +49,25 @@ export const CategoryComboTableBody = React.memo(
             [sortedCOCs, dataElements, greyedFields]
         )
         const hasGreyedColumnsHidden = visibleCOCs.length !== sortedCOCs.length
+
+        // Data elements acting as visual separators: every one of their combos
+        // is greyed, so the row has no editable cell at all
+        const subSectionDeIds = useMemo(
+            () =>
+                new Set(
+                    dataElements
+                        .filter((dataElement) =>
+                            isSubSectionDataElement({
+                                dataElement,
+                                sortedCOCs,
+                                greyedFields,
+                                getFieldId,
+                            })
+                        )
+                        .map(({ id }) => id)
+                ),
+            [dataElements, sortedCOCs, greyedFields]
+        )
 
         const checkTableActive = useCallback(
             (activeDeId) => dataElements.some(({ id }) => id === activeDeId),
@@ -126,7 +146,10 @@ export const CategoryComboTableBody = React.memo(
                             key={de.id}
                             className={cx({ [styles.hidden]: hidden })}
                         >
-                            <DataElementCell dataElement={de} />
+                            <DataElementCell
+                                dataElement={de}
+                                isSubSection={subSectionDeIds.has(de.id)}
+                            />
                             {visibleCOCs.map((coc) => (
                                 <DataEntryCell key={coc.id}>
                                     <DataEntryField

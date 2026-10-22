@@ -28,6 +28,19 @@
     max-inline-size: 350px;
 }
 
+/* Data elements used as visual separators inside a section. Declared after
+   `.cellBase` on purpose: both set the font size with `!important` at the same
+   specificity, so the one coming last in this file wins. */
+.subSectionName {
+    font-size: 18px !important;
+    font-weight: 700;
+    /* `.cellBase` locks the line height at 15px, which would crop 18px text */
+    line-height: 22px !important;
+    background-color: var(--colors-grey500);
+    /* browsers drop background colours when printing unless this is forced */
+    print-color-adjust: exact;
+}
+
 .active {
     background-color: var(--colors-grey300);
 }

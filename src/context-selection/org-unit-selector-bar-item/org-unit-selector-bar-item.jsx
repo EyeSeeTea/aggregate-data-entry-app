@@ -25,7 +25,12 @@ import usePrefetchedOrganisationUnits from './use-prefetched-organisation-units.
 import useSelectorBarItemValue from './use-select-bar-item-value.js'
 import useUserOrgUnits from './use-user-org-units.js'
 
-function useTreeFilterPaths(dataSetId, dataSetOrgUnitPaths, filter, filteredOrgUnitPaths) {
+function useTreeFilterPaths({
+    dataSetId,
+    dataSetOrgUnitPaths,
+    filter,
+    filteredOrgUnitPaths,
+}) {
     return useMemo(() => {
         if (dataSetId && filter) {
             const dataSetPathSet = new Set(dataSetOrgUnitPaths.data || [])
@@ -87,18 +92,20 @@ export default function OrganisationUnitSetSelectorBarItem() {
     const selected = orgUnit.data ? [orgUnit.data.path] : []
     const filteredOrgUnitPaths = filter ? orgUnitPathsByName.data : []
 
-    const treeFilterPaths = useTreeFilterPaths(
-        hideUnassignedOrgUnits ? dataSetId : undefined,
+    const treeFilterPaths = useTreeFilterPaths({
+        dataSetId: hideUnassignedOrgUnits ? dataSetId : undefined,
         dataSetOrgUnitPaths,
         filter,
-        filteredOrgUnitPaths
-    )
+        filteredOrgUnitPaths,
+    })
 
     const orgUnitPathsByNameLoading =
         // offline levels need to be prefetched before rendering the org-unit-tree
         prefetchedOrganisationUnits.loading ||
         // dataset org unit paths must be loaded before filtering the tree
-        (!!hideUnassignedOrgUnits && !!dataSetId && dataSetOrgUnitPaths.loading) ||
+        (!!hideUnassignedOrgUnits &&
+            !!dataSetId &&
+            dataSetOrgUnitPaths.loading) ||
         // Either a filter has been set but the hook
         // hasn't been called yet
         (filter !== '' && !orgUnitPathsByName.called) ||
